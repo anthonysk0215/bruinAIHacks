@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ThemeProvider } from './components/theme-provider';
 import { MicButton } from './components/mic-button';
 import { AccountMenu } from './components/account-menu';
+import { SpeechToText } from './components/speech-to-text';
 
 interface Message {
   text: string;
@@ -11,6 +12,7 @@ interface Message {
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [currentTranscript, setCurrentTranscript] = useState<string>("");
 
   const handleStartRecording = (): void => {
     setIsRecording(true);
@@ -18,6 +20,14 @@ function App() {
 
   const handleStopRecording = (): void => {
     setIsRecording(false);
+    if (currentTranscript.trim()) {
+      setMessages(prev => [...prev, { text: currentTranscript, isUser: true }]);
+      setCurrentTranscript("");
+    }
+  };
+
+  const handleTranscriptUpdate = (transcript: string): void => {
+    setCurrentTranscript(transcript);
   };
 
   const handleLogout = (): void => {
@@ -52,6 +62,10 @@ function App() {
               isRecording={isRecording}
               onStartRecording={handleStartRecording}
               onStopRecording={handleStopRecording}
+            />
+            <SpeechToText
+              isRecording={isRecording}
+              onTranscriptUpdate={handleTranscriptUpdate}
             />
           </div>
         </main>
