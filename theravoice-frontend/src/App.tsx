@@ -1,74 +1,127 @@
-import { useState } from 'react';
-import { ThemeProvider } from './components/theme-provider';
-import { MicButton } from './components/mic-button';
-import { AccountMenu } from './components/account-menu';
-import { SpeechToText } from './components/speech-to-text';
+import { useEffect } from 'react';
+import { 
+  ThemeProvider,
+  createTheme,
+  CssBaseline
+} from '@mui/material';
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#3b82f6',
+    },
+    secondary: {
+      main: '#f50057',
+    },
+    background: {
+      default: '#0a0c10',
+      paper: '#1e2030',
+    },
+  },
+});
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [currentTranscript, setCurrentTranscript] = useState<string>("");
+  useEffect(() => {
+    // Load the ElevenLabs widget script
+    const script = document.createElement('script');
+    script.src = 'https://elevenlabs.io/convai-widget/index.js';
+    script.async = true;
+    script.type = 'text/javascript';
+    document.body.appendChild(script);
 
-  const handleStartRecording = (): void => {
-    setIsRecording(true);
-  };
-
-  const handleStopRecording = (): void => {
-    setIsRecording(false);
-    if (currentTranscript.trim()) {
-      setMessages(prev => [...prev, { text: currentTranscript, isUser: true }]);
-      setCurrentTranscript("");
-    }
-  };
-
-  const handleTranscriptUpdate = (transcript: string): void => {
-    setCurrentTranscript(transcript);
-  };
-
-  const handleLogout = (): void => {
-    // TODO: Implement logout functionality
-    console.log('Logging out...');
-  };
+    return () => {
+      // Cleanup script on component unmount
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="theravoice-theme">
-      <div className="relative flex flex-col h-screen bg-[#0a0c10]">
-        {/* Top Bar with Logo and Account Menu */}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
+        {/* Top Bar with Logo */}
         <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-          <div className="flex-1" /> {/* Spacer */}
+          <div className="flex-1" />
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
             TheraVoice
           </h1>
           <div className="flex-1 flex justify-end">
-            <AccountMenu onLogout={handleLogout} />
+            <button className="text-gray-400 hover:text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
           </div>
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
           <div className="text-center mb-24">
             <h2 className="text-4xl font-bold text-white mb-4">Speak Your Mind</h2>
             <p className="text-gray-400 text-center max-w-md text-lg">
-              Press the mic button and start talking. TheraVoice is here to listen and support you.
+              Press the "Start a call" button and start talking. TheraVoice is here to listen and support you.
             </p>
           </div>
-          <div className="relative">
-            <MicButton
-              isRecording={isRecording}
-              onStartRecording={handleStartRecording}
-              onStopRecording={handleStopRecording}
-            />
-            <SpeechToText
-              isRecording={isRecording}
-              onTranscriptUpdate={handleTranscriptUpdate}
-            />
+
+          {/* ElevenLabs Widget Container */}
+          <div className="relative flex items-center justify-center w-full">
+            <style>{`
+              elevenlabs-convai {
+                --elevenlabs-convai-button-background: transparent;
+                --elevenlabs-convai-button-color: #3b82f6;
+                --elevenlabs-convai-button-border: 2px solid #3b82f6;
+                --elevenlabs-convai-button-hover-background: #3b82f6;
+                --elevenlabs-convai-button-hover-color: white;
+                --elevenlabs-convai-button-active-background: #2563eb;
+                --elevenlabs-convai-button-active-color: white;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 10;
+              }
+              elevenlabs-convai::part(widget) {
+                position: fixed;
+                bottom: unset !important;
+                right: unset !important;
+                transform: none !important;
+              }
+              elevenlabs-convai::part(start-button) {
+                font-size: 0;
+                width: 120px !important;
+                height: 120px !important;
+                border-radius: 60px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: rgba(59, 130, 246, 0.1) !important;
+                transition: all 0.3s ease !important;
+              }
+              elevenlabs-convai::part(start-button)::after {
+                content: 'Start a chat';
+                font-size: 1rem;
+                position: absolute;
+                width: max-content;
+                text-align: center;
+                bottom: -2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #3b82f6;
+              }
+              elevenlabs-convai::part(start-button):hover {
+                background: rgba(59, 130, 246, 0.2) !important;
+                transform: scale(1.05);
+              }
+              elevenlabs-convai::part(microphone-icon) {
+                width: 48px !important;
+                height: 48px !important;
+                color: #3b82f6 !important;
+              }
+            `}</style>
+            <elevenlabs-convai agent-id="psygj8PjwBuyucio3N5d"></elevenlabs-convai>
           </div>
-        </main>
+        </div>
 
         {/* Scheduled Sessions - Bottom Left */}
         <div className="absolute bottom-6 left-6">

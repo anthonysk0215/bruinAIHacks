@@ -1,6 +1,6 @@
 # TheraVoice - Mental Health Assistant
 
-TheraVoice is a web-based mental health assistant that provides empathetic support through voice interactions. Users can speak their thoughts and receive AI-generated responses in a supportive, conversational manner.
+TheraVoice is a web-based mental health assistant that provides empathetic support through voice interactions. Users can speak their thoughts and receive AI-generated responses in a supportive, conversational manner using ElevenLabs' advanced Conversational AI technology.
 
 ## Tech Stack
 
@@ -9,20 +9,31 @@ TheraVoice is a web-based mental health assistant that provides empathetic suppo
 - **TypeScript** - Typed superset of JavaScript
 - **Material-UI (MUI)** - React UI framework for modern, responsive design
 - **Vite** - Next Generation Frontend Tooling
-- **Web Speech API** - For speech recognition and synthesis
+- **TailwindCSS** - Utility-first CSS framework
 
-### Backend
-- **Node.js** - JavaScript runtime environment
-- **Express** - Web framework for Node.js
-- **TypeScript** - Typed superset of JavaScript
-- **OpenAI API** - For generating empathetic responses
-- **CORS** - For handling cross-origin requests
+### AI Integration
+- **ElevenLabs Conversational AI** - Complete toolkit for voice-based AI interactions
+  - Speech-to-Text (Transcription)
+  - Large Language Model Integration
+  - Text-to-Speech with natural voices
+  - Advanced turn-taking and interruption handling
+  - Real-time, low-latency responses
+
+## Features
+
+- Real-time voice conversations with AI
+- Natural and empathetic responses
+- Modern, responsive dark theme UI
+- Seamless voice interaction handling
+- Low-latency audio processing
+- Support for natural conversation flow
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- OpenAI API key
+- ElevenLabs API key
+- Modern web browser (Chrome/Edge recommended)
 
 ## Setup Instructions
 
@@ -41,9 +52,7 @@ npm install
 
 # Create .env file
 echo "PORT=3001
-OPENAI_API_KEY=your_openai_api_key_here" > .env
-
-# Replace 'your_openai_api_key_here' with your actual OpenAI API key
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here" > .env
 
 # Start the development server
 npm run dev
@@ -89,42 +98,16 @@ theravoice/
 - Voice-to-text and text-to-voice capabilities
 - Secure API communication
 
-## Development
 
-### Backend Development
-```bash
-cd theravoice-backend
-npm run dev    # Start development server with hot reload
-```
+## How It Works
 
-### Frontend Development
-```bash
-cd theravoice-frontend
-npm run dev    # Start development server with hot reload
-```
+TheraVoice leverages ElevenLabs' Conversational AI platform to provide:
 
-## Production Build
-
-### Backend
-```bash
-cd theravoice-backend
-npm run build  # Compile TypeScript to JavaScript
-npm start      # Start production server
-```
-
-### Frontend
-```bash
-cd theravoice-frontend
-npm run build  # Create production build
-```
-
-## Environment Variables
-
-### Backend (.env)
-```
-PORT=3001
-OPENAI_API_KEY=your_openai_api_key_here
-```
+1. **Speech Recognition**: Real-time transcription of user speech
+2. **Natural Language Processing**: Understanding and processing user input
+3. **Empathetic Response Generation**: Creating contextually appropriate responses
+4. **Voice Synthesis**: Converting responses to natural-sounding speech
+5. **Turn Management**: Handling natural conversation flow with proper timing
 
 ## Contributing
 
