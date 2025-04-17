@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Text</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        .status {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+        #debug {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speech to Text</h1>
+        <button id="startButton">Start Recording</button>
+        <button id="stopButton" disabled>Stop Recording</button>
+        <div class="status" id="status">Click Start Recording to begin</div>
+        <div id="result"></div>
+        <div id="debug"></div>
+    </div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resultDiv = document.getElementById('result');
+        const statusDiv = document.getElementById('status');
+        const debugDiv = document.getElementById('debug');
+        
+        let recognition;
+        let isRecording = false;
+
+        function log(message) {
+            console.log(message);
+            debugDiv.innerHTML += message + '\n';
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+
+        // Check browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            log('Speech recognition supported');
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                log('Speech recognition started');
+                statusDiv.textContent = 'Listening...';
+            };
+
+            recognition.onresult = (event) => {
+                log('Speech recognition result received');
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                        log('Final transcript: ' + transcript);
+                    } else {
+                        interimTranscript += transcript;
+                        log('Interim transcript: ' + transcript);
+                    }
+                }
+
+                resultDiv.innerHTML = finalTranscript + '<span style="color: #999;">' + interimTranscript + '</span>';
+            };
+
+            recognition.onerror = (event) => {
+                log('Speech recognition error: ' + event.error);
+                statusDiv.textContent = 'Error: ' + event.error;
+                stopRecording();
+            };
+
+            recognition.onend = () => {
+                log('Speech recognition ended');
+                if (isRecording) {
+                    log('Restarting recognition...');
+                    recognition.start();
+                } else {
+                    statusDiv.textContent = 'Ready to record';
+                }
+            };
+        } else {
+            log('Speech recognition not supported in this browser');
+            resultDiv.innerHTML = 'Speech recognition not supported in this browser.';
+            startButton.disabled = true;
+            statusDiv.textContent = 'Speech recognition not supported';
+        }
+
+        function startRecording() {
+            log('Starting recording...');
+            if (recognition) {
+                try {
+                    recognition.start();
+                    isRecording = true;
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                    statusDiv.textContent = 'Listening...';
+                } catch (error) {
+                    log('Error starting recognition: ' + error);
+                    statusDiv.textContent = 'Error starting recognition';
+                }
+            }
+        }
+
+        function stopRecording() {
+            log('Stopping recording...');
+            if (recognition) {
+                try {
+                    recognition.stop();
+                    isRecording = false;
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+                    statusDiv.textContent = 'Ready to record';
+                } catch (error) {
+                    log('Error stopping recognition: ' + error);
+                }
+            }
+        }
+
+        startButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+
+        // Check microphone permissions
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                log('Microphone access granted');
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(error => {
+                log('Microphone access denied: ' + error);
+                statusDiv.textContent = 'Microphone access denied';
+                startButton.disabled = true;
+            });
+    </script>
+</body>
+</html> 

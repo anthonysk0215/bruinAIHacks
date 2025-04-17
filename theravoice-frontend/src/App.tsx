@@ -5,6 +5,21 @@ import {
   CssBaseline
 } from '@mui/material';
 import ResourcesPage from './components/ResourcesPage';
+import ChatHistory from './components/ChatHistory';
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { 'agent-id': string }, HTMLElement>;
+    }
+  }
+}
+
+interface Conversation {
+  id: string;
+  timestamp: string;
+  messages: string[];
+}
 
 const theme = createTheme({
   palette: {
@@ -24,6 +39,9 @@ const theme = createTheme({
 
 function App() {
   const [showResources, setShowResources] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversation, setCurrentConversation] = useState<string[]>([]);
 
   useEffect(() => {
     // Load the ElevenLabs widget script
@@ -33,11 +51,58 @@ function App() {
     script.type = 'text/javascript';
     document.body.appendChild(script);
 
+    // Load saved conversations from localStorage
+    const savedConversations = localStorage.getItem('conversations');
+    if (savedConversations) {
+      setConversations(JSON.parse(savedConversations));
+    }
+
+    // Add event listeners for the widget
+    const handleWidgetMessage = (event: any) => {
+      if (event.detail?.type === 'message') {
+        handleNewMessage(event.detail.text, event.detail.isUser);
+      } else if (event.detail?.type === 'end') {
+        handleConversationEnd();
+      }
+    };
+
+    window.addEventListener('elevenlabs-conversation', handleWidgetMessage);
+
     return () => {
-      // Cleanup script on component unmount
       document.body.removeChild(script);
+      window.removeEventListener('elevenlabs-conversation', handleWidgetMessage);
     };
   }, []);
+
+  // Save conversation when it ends
+  const handleConversationEnd = () => {
+    if (currentConversation.length > 0) {
+      const newConversation: Conversation = {
+        id: Date.now().toString(),
+        timestamp: new Date().toLocaleString(),
+        messages: currentConversation
+      };
+      
+      const updatedConversations = [...conversations, newConversation];
+      setConversations(updatedConversations);
+      localStorage.setItem('conversations', JSON.stringify(updatedConversations));
+      setCurrentConversation([]);
+    }
+  };
+
+  // Handle new message
+  const handleNewMessage = (text: string, isUser: boolean) => {
+    setCurrentConversation(prev => [...prev, `${isUser ? 'You' : 'Therapist'}: ${text}`]);
+  };
+
+  if (showHistory) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ChatHistory onBack={() => setShowHistory(false)} />
+      </ThemeProvider>
+    );
+  }
 
   if (showResources) {
     return (
@@ -72,21 +137,27 @@ function App() {
       <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
         {/* Top Bar with Logo */}
         <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-          <div className="flex-1" />
+          <button 
+            onClick={() => setShowHistory(true)}
+            className="text-gray-400 hover:text-white flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            History
+          </button>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
             TheraVoice
           </h1>
-          <div className="flex-1 flex justify-end">
-            <button 
-              onClick={() => setShowResources(true)}
-              className="text-gray-400 hover:text-white flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Resources
-            </button>
-          </div>
+          <button 
+            onClick={() => setShowResources(true)}
+            className="text-gray-400 hover:text-white flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Resources
+          </button>
         </div>
 
         {/* Main Content Area */}
