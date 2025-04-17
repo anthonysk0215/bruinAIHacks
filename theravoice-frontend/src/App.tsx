@@ -240,7 +240,7 @@ function App() {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-center mb-24">
+          <div className="text-center mb-2">
             <h2 className="text-4xl font-bold text-white mb-4">Speak Your Mind</h2>
             <p className="text-gray-400 text-center max-w-md text-lg">
               Press the "Start a call" button and start talking. TheraVoice is here to listen and support you.
@@ -248,7 +248,7 @@ function App() {
           </div>
 
           {/* ElevenLabs Widget Container */}
-          <div className="relative flex items-center justify-center w-full">
+          <div className="relative flex items-center justify-center w-full mt-0">
             <style>{`
               elevenlabs-convai {
                 --elevenlabs-convai-button-background: transparent;
@@ -258,14 +258,14 @@ function App() {
                 --elevenlabs-convai-button-hover-color: white;
                 --elevenlabs-convai-button-active-background: #2563eb;
                 --elevenlabs-convai-button-active-color: white;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+                position: relative;
+                top: 0;
+                left: 0;
+                transform: none;
                 z-index: 10;
               }
               elevenlabs-convai::part(widget) {
-                position: fixed;
+                position: relative;
                 bottom: unset !important;
                 right: unset !important;
                 transform: none !important;
