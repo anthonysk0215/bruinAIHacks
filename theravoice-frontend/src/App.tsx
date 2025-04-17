@@ -6,6 +6,8 @@ import {
 } from '@mui/material';
 import ResourcesPage from './components/ResourcesPage';
 import ChatHistory from './components/ChatHistory';
+import { AboutPage } from './components/AboutPage';
+import { AccountPage } from './components/AccountPage';
 
 declare global {
   namespace JSX {
@@ -40,6 +42,8 @@ const theme = createTheme({
 function App() {
   const [showResources, setShowResources] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<string[]>([]);
 
@@ -131,33 +135,107 @@ function App() {
     );
   }
 
+  if (showAccount) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
+          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
+            <button 
+              onClick={() => setShowAccount(false)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Chat
+            </button>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
+              Account Settings
+            </h1>
+            <div className="w-24" />
+          </div>
+          <AccountPage />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  if (showAbout) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
+          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
+            <button 
+              onClick={() => setShowAbout(false)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Chat
+            </button>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
+              About TheraVoice
+            </h1>
+            <div className="w-24" />
+          </div>
+          <AboutPage />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
         {/* Top Bar with Logo */}
         <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-          <button 
-            onClick={() => setShowHistory(true)}
-            className="text-gray-400 hover:text-white flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            History
-          </button>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setShowHistory(true)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              History
+            </button>
+            <button 
+              onClick={() => setShowAbout(true)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              About
+            </button>
+          </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
             TheraVoice
           </h1>
-          <button 
-            onClick={() => setShowResources(true)}
-            className="text-gray-400 hover:text-white flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Resources
-          </button>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setShowResources(true)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Resources
+            </button>
+            <button 
+              onClick={() => setShowAccount(true)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Account
+            </button>
+          </div>
         </div>
 
         {/* Main Content Area */}
