@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   ThemeProvider,
   createTheme,
   CssBaseline
 } from '@mui/material';
+import ResourcesPage from './components/ResourcesPage';
 
 const theme = createTheme({
   palette: {
@@ -22,6 +23,8 @@ const theme = createTheme({
 });
 
 function App() {
+  const [showResources, setShowResources] = useState(false);
+
   useEffect(() => {
     // Load the ElevenLabs widget script
     const script = document.createElement('script');
@@ -36,6 +39,33 @@ function App() {
     };
   }, []);
 
+  if (showResources) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
+          {/* Top Bar with Logo and Back Button */}
+          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
+            <button 
+              onClick={() => setShowResources(false)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Chat
+            </button>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
+              Therapeutic Resources
+            </h1>
+            <div className="w-24" /> {/* Spacer for balance */}
+          </div>
+          <ResourcesPage />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -47,10 +77,14 @@ function App() {
             TheraVoice
           </h1>
           <div className="flex-1 flex justify-end">
-            <button className="text-gray-400 hover:text-white">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <button 
+              onClick={() => setShowResources(true)}
+              className="text-gray-400 hover:text-white flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
+              Resources
             </button>
           </div>
         </div>
