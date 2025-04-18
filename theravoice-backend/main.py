@@ -12,6 +12,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import logging
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from supabase import create_client, Client
+from elevenlabs import generate, play, set_api_key
+import asyncio
+import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +29,7 @@ app = FastAPI()
 # Configure CORS with proper settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL
+    allow_origins=["http://localhost:5173", "http://localhost:5181"],  # Frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,6 +40,25 @@ app.add_middleware(
 security = HTTPBearer()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
+
+# Initialize Supabase client
+try:
+    supabase: Client = create_client(
+        os.getenv("SUPABASE_URL", ""),
+        os.getenv("SUPABASE_KEY", ""),
+        options={
+            "auth": {
+                "autoRefreshToken": True,
+                "persistSession": True
+            }
+        }
+    )
+except Exception as e:
+    logger.error(f"Error initializing Supabase client: {e}")
+    raise
+
+# Initialize ElevenLabs
+set_api_key(os.getenv("ELEVENLABS_API_KEY", ""))
 
 # Models
 class User(BaseModel):
