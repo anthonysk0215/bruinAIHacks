@@ -11,6 +11,11 @@ TheraVoice is a web-based mental health assistant that provides empathetic suppo
 - **Vite** - Next Generation Frontend Tooling
 - **TailwindCSS** - Utility-first CSS framework
 
+### Backend
+- **FastAPI** - Modern, fast web framework for building APIs with Python
+- **Python 3.12+** - Programming language
+- **ElevenLabs API** - Voice AI platform integration
+
 ### AI Integration
 - **ElevenLabs Conversational AI** - Complete toolkit for voice-based AI interactions
   - Speech-to-Text (Transcription)
@@ -31,6 +36,7 @@ TheraVoice is a web-based mental health assistant that provides empathetic suppo
 ## Prerequisites
 
 - Node.js (v14 or higher)
+- Python 3.12 or higher
 - npm (v6 or higher)
 - ElevenLabs API key
 - Modern web browser (Chrome/Edge recommended)
@@ -47,18 +53,17 @@ cd theravoice
 ```bash
 cd theravoice-backend
 
-# Install dependencies
-npm install
+# Install Python dependencies
+pip install -r requirements.txt
 
 # Create .env file
-echo "PORT=3001
-ELEVENLABS_API_KEY=your_elevenlabs_api_key_here" > .env
+echo "ELEVENLABS_API_KEY=your_elevenlabs_api_key_here" > .env
 
-# Start the development server
-npm run dev
+# Start the FastAPI server
+python main.py
 ```
 
-The backend server will run on `http://localhost:3001`
+The backend server will run on `http://localhost:8000`
 
 ### 3. Frontend Setup
 ```bash
@@ -72,23 +77,6 @@ npm run dev
 ```
 
 The frontend will be available at `http://localhost:5173`
-
-## Project Structure
-
-```
-theravoice/
-├── theravoice-frontend/     # React frontend application
-│   ├── src/
-│   │   ├── App.tsx         # Main application component
-│   │   └── ...             # Other frontend files
-│   └── package.json
-│
-└── theravoice-backend/      # Node.js backend server
-    ├── src/
-    │   └── server.ts       # Express server implementation
-    ├── .env                # Environment variables
-    └── package.json
-```
 
 ## Features
 
@@ -112,7 +100,7 @@ TheraVoice leverages ElevenLabs' Conversational AI platform to provide:
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
