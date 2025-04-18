@@ -62,6 +62,21 @@ export const AboutPage = () => {
     }
   };
 
+  const fadeUpVariants = {
+    hidden: { 
+      opacity: 0,
+      y: 20
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   const iconVariants = {
     hidden: { rotate: -180, opacity: 0 },
     visible: {
@@ -101,6 +116,7 @@ export const AboutPage = () => {
             scale: titleScale,
             opacity: titleOpacity
           }}
+          variants={fadeUpVariants}
         >
           <Typography 
             variant="h2" 

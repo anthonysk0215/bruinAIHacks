@@ -96,6 +96,22 @@ const PageTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </motion.div>
 );
 
+// Add this before the App component
+const fadeUpVariants = {
+  hidden: { 
+    opacity: 0,
+    y: 20
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
+
 export const App: React.FC = () => {
   const { user, loading, signOut } = useAuth();
   const [showResources, setShowResources] = useState(false);
@@ -378,16 +394,39 @@ export const App: React.FC = () => {
           ) : (
             <Box sx={{ flex: 1, p: 3 }}>
               {/* Main Content Area */}
-              <div className="flex-1 flex flex-col items-center justify-center p-8">
-                <div className="text-center mb-2">
-                  <h2 className="text-4xl font-bold text-white mb-4">Speak Your Mind</h2>
-                  <p className="text-gray-400 text-center max-w-md text-lg">
+              <motion.div 
+                className="flex-1 flex flex-col items-center justify-center p-8"
+                initial="hidden"
+                animate="visible"
+                variants={fadeUpVariants}
+                style={{ marginTop: '10vh' }}
+              >
+                <div className="text-center mb-8">
+                  <motion.h2 
+                    className="text-4xl font-bold text-white mb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    Speak Your Mind
+                  </motion.h2>
+                  <motion.p 
+                    className="text-gray-400 text-center max-w-md text-lg"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
                     Press the "Start a call" button and start talking. TheraVoice is here to listen and support you.
-                  </p>
+                  </motion.p>
                 </div>
 
                 {/* ElevenLabs Widget Container */}
-                <div className="relative flex items-center justify-center w-full mt-0">
+                <motion.div 
+                  className="relative flex items-center justify-center w-full mt-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
                   <style>{`
                     elevenlabs-convai {
                       --elevenlabs-convai-button-background: transparent;
@@ -442,8 +481,8 @@ export const App: React.FC = () => {
                     }
                   `}</style>
                   <elevenlabs-convai agent-id="psygj8PjwBuyucio3N5d"></elevenlabs-convai>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
               {/* Scheduled Sessions - Bottom Left */}
               <div className="absolute bottom-6 left-6">
