@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 import os
 from dotenv import load_dotenv
@@ -13,9 +13,12 @@ import logging
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from supabase import create_client, Client
-from elevenlabs import generate, play, set_api_key
 import asyncio
 import uuid
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.date import DateTrigger
+import pytz
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,11 +32,13 @@ app = FastAPI()
 # Configure CORS with proper settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5181"],  # Frontend URLs
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", 
+                  "http://localhost:5176", "http://localhost:5177", "http://localhost:5178",
+                  "http://localhost:5179", "http://localhost:5180", "http://localhost:5181",
+                  "http://localhost:5182"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
 # Security
@@ -41,24 +46,41 @@ security = HTTPBearer()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
 
+# Email configuration
+email_conf = ConnectionConfig(
+    MAIL_USERNAME=os.getenv("EMAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("EMAIL_PASSWORD"),
+    MAIL_FROM=os.getenv("EMAIL_FROM"),
+    MAIL_PORT=587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True
+)
+
+# Initialize FastMail with proper error handling
+try:
+    fastmail = FastMail(email_conf)
+    logger.info("FastMail initialized successfully")
+except Exception as e:
+    logger.error(f"Error initializing FastMail: {e}")
+    raise
+
 # Initialize Supabase client
 try:
     supabase: Client = create_client(
-        os.getenv("SUPABASE_URL", ""),
-        os.getenv("SUPABASE_KEY", ""),
-        options={
-            "auth": {
-                "autoRefreshToken": True,
-                "persistSession": True
-            }
-        }
+        supabase_url=os.getenv("SUPABASE_URL", ""),
+        supabase_key=os.getenv("SUPABASE_KEY", "")
     )
+    logger.info("Supabase client initialized successfully")
 except Exception as e:
     logger.error(f"Error initializing Supabase client: {e}")
     raise
 
-# Initialize ElevenLabs
-set_api_key(os.getenv("ELEVENLABS_API_KEY", ""))
+# Initialize scheduler
+scheduler = AsyncIOScheduler()
+scheduler.start()
 
 # Models
 class User(BaseModel):
@@ -72,6 +94,10 @@ class Token(BaseModel):
 class Message(BaseModel):
     text: str
     is_user: bool
+
+class AppointmentRequest(BaseModel):
+    email: EmailStr
+    appointment_time: datetime
 
 # Dependencies
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -122,6 +148,67 @@ async def chat(message: Message, current_user: str = Depends(get_current_user)):
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
+
+@app.post("/test-email")
+async def test_email(email: str):
+    try:
+        message = MessageSchema(
+            subject="Test Email from TheraVoice",
+            recipients=[email],
+            body="This is a test email from TheraVoice. If you receive this, email sending is working correctly.",
+            subtype="html"
+        )
+        
+        await fastmail.send_message(message)
+        logger.info(f"Test email sent successfully to {email}")
+        return {"message": "Test email sent successfully"}
+    except Exception as e:
+        logger.error(f"Error sending test email: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/schedule-appointment")
+async def schedule_appointment(appointment: AppointmentRequest):
+    try:
+        # Convert appointment time to PT
+        pt = pytz.timezone('America/Los_Angeles')
+        appointment_time_pt = appointment.appointment_time.astimezone(pt)
+        
+        # Validate appointment time is in the future
+        if appointment_time_pt < datetime.now(pt):
+            raise HTTPException(status_code=400, detail="Appointment time must be in the future")
+        
+        # Schedule the email reminder
+        scheduler.add_job(
+            send_appointment_reminder,
+            DateTrigger(run_date=appointment_time_pt),
+            args=[appointment.email, appointment_time_pt],
+            id=str(uuid.uuid4())
+        )
+        
+        logger.info(f"Appointment scheduled for {appointment_time_pt} PT")
+        return {
+            "message": "Appointment scheduled successfully",
+            "appointment_time_pt": appointment_time_pt.isoformat(),
+            "appointment_time_utc": appointment.appointment_time.isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error scheduling appointment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def send_appointment_reminder(email: str, appointment_time: datetime):
+    try:
+        message = MessageSchema(
+            subject="Your TheraVoice Session Reminder",
+            recipients=[email],
+            body="This is a reminder that your TheraVoice session is starting now.",
+            subtype="html"
+        )
+        
+        await fastmail.send_message(message)
+        logger.info(f"Appointment reminder sent successfully to {email}")
+    except Exception as e:
+        logger.error(f"Error sending appointment reminder: {e}")
+        raise
 
 if __name__ == "__main__":
     import uvicorn
