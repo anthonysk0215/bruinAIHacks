@@ -20,6 +20,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { supabase } from './lib/supabaseClient';
 import InfoIcon from '@mui/icons-material/Info';
 import ArticleIcon from '@mui/icons-material/Article';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { motion } from 'framer-motion';
 
 declare global {
   namespace JSX {
@@ -56,6 +58,43 @@ const theme = createTheme({
     },
   },
 });
+
+const NavButton: React.FC<{ onClick: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    style={{ display: 'inline-block' }}
+  >
+    <button
+      onClick={onClick}
+      className="text-gray-300 hover:text-white flex items-center transition-colors duration-200 ease-in-out font-medium"
+      style={{ 
+        textShadow: '0px 1px 2px rgba(0,0,0,0.2)',
+        letterSpacing: '0.025em'
+      }}
+    >
+      {children}
+    </button>
+  </motion.div>
+);
+
+const PageTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+  >
+    <h1 
+      className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent"
+      style={{ 
+        fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
+        letterSpacing: '-0.025em',
+        textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
+      }}
+    >
+      {children}
+    </h1>
+  </motion.div>
+);
 
 export const App: React.FC = () => {
   const { user, loading, signOut } = useAuth();
@@ -112,25 +151,26 @@ export const App: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
-          {/* Top Bar with Logo and Back Button */}
-          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-            <button 
-              onClick={() => setShowResources(false)}
-              className="text-gray-400 hover:text-white flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative flex flex-col min-h-screen bg-[#0a0c10]"
+        >
+          <motion.div 
+            initial={{ borderColor: 'rgba(30, 32, 48, 0)' }}
+            animate={{ borderColor: 'rgba(30, 32, 48, 1)' }}
+            transition={{ duration: 0.5 }}
+            className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6 backdrop-blur-sm bg-[#0a0c10]/80"
+          >
+            <NavButton onClick={() => setShowResources(false)}>
+              <ArrowBackIcon className="w-5 h-5 mr-2" />
               Back to Chat
-            </button>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
-              Therapeutic Resources
-            </h1>
-            <div className="w-24" /> {/* Spacer for balance */}
-          </div>
+            </NavButton>
+            <PageTitle>Therapeutic Resources</PageTitle>
+            <div className="w-24" />
+          </motion.div>
           <ResourcesPage />
-        </div>
+        </motion.div>
       </ThemeProvider>
     );
   }
@@ -139,24 +179,26 @@ export const App: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
-          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-            <button 
-              onClick={() => setShowAccount(false)}
-              className="text-gray-400 hover:text-white flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative flex flex-col min-h-screen bg-[#0a0c10]"
+        >
+          <motion.div 
+            initial={{ borderColor: 'rgba(30, 32, 48, 0)' }}
+            animate={{ borderColor: 'rgba(30, 32, 48, 1)' }}
+            transition={{ duration: 0.5 }}
+            className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6 backdrop-blur-sm bg-[#0a0c10]/80"
+          >
+            <NavButton onClick={() => setShowAccount(false)}>
+              <ArrowBackIcon className="w-5 h-5 mr-2" />
               Back to Chat
-            </button>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
-              Account Settings
-            </h1>
+            </NavButton>
+            <PageTitle>Account Settings</PageTitle>
             <div className="w-24" />
-          </div>
+          </motion.div>
           <AccountPage />
-        </div>
+        </motion.div>
       </ThemeProvider>
     );
   }
@@ -165,24 +207,26 @@ export const App: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
-          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-            <button 
-              onClick={() => setShowAbout(false)}
-              className="text-gray-400 hover:text-white flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative flex flex-col min-h-screen bg-[#0a0c10]"
+        >
+          <motion.div 
+            initial={{ borderColor: 'rgba(30, 32, 48, 0)' }}
+            animate={{ borderColor: 'rgba(30, 32, 48, 1)' }}
+            transition={{ duration: 0.5 }}
+            className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6 backdrop-blur-sm bg-[#0a0c10]/80"
+          >
+            <NavButton onClick={() => setShowAbout(false)}>
+              <ArrowBackIcon className="w-5 h-5 mr-2" />
               Back to Chat
-            </button>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
-              About TheraVoice
-            </h1>
+            </NavButton>
+            <PageTitle>About TheraVoice</PageTitle>
             <div className="w-24" />
-          </div>
+          </motion.div>
           <AboutPage />
-        </div>
+        </motion.div>
       </ThemeProvider>
     );
   }
@@ -191,24 +235,26 @@ export const App: React.FC = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="relative flex flex-col min-h-screen bg-[#0a0c10]">
-          <div className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6">
-            <button 
-              onClick={() => setShowScheduling(false)}
-              className="text-gray-400 hover:text-white flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative flex flex-col min-h-screen bg-[#0a0c10]"
+        >
+          <motion.div 
+            initial={{ borderColor: 'rgba(30, 32, 48, 0)' }}
+            animate={{ borderColor: 'rgba(30, 32, 48, 1)' }}
+            transition={{ duration: 0.5 }}
+            className="h-16 border-b border-[#1e2030] flex items-center justify-between px-6 backdrop-blur-sm bg-[#0a0c10]/80"
+          >
+            <NavButton onClick={() => setShowScheduling(false)}>
+              <ArrowBackIcon className="w-5 h-5 mr-2" />
               Back to Chat
-            </button>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] bg-clip-text text-transparent">
-              Schedule Session
-            </h1>
+            </NavButton>
+            <PageTitle>Schedule Your Session</PageTitle>
             <div className="w-24" />
-          </div>
+          </motion.div>
           <SchedulingPage />
-        </div>
+        </motion.div>
       </ThemeProvider>
     );
   }
@@ -224,18 +270,29 @@ export const App: React.FC = () => {
           display: 'flex',
           flexDirection: 'column'
         }}>
-          <AppBar position="static" sx={{ bgcolor: '#1e2030' }}>
-            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', gap: 2 }}>
+          <AppBar position="static" sx={{ 
+            bgcolor: '#0a0c10',
+            boxShadow: 'none',
+            borderBottom: '1px solid rgba(30, 32, 48, 0.5)'
+          }}>
+            <Toolbar sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              minHeight: '80px'
+            }}>
+              <Box sx={{ display: 'flex', gap: 3 }}>
                 <Button 
                   color="inherit"
                   onClick={() => setShowAbout(true)}
                   startIcon={<InfoIcon />}
                   sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
                     '&:hover': {
-                      color: 'white'
+                      color: 'white',
+                      backgroundColor: 'rgba(30, 32, 48, 0.3)'
                     }
                   }}
                 >
@@ -245,10 +302,13 @@ export const App: React.FC = () => {
                   color="inherit"
                   onClick={() => setShowScheduling(true)}
                   sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
                     '&:hover': {
-                      color: 'white'
+                      color: 'white',
+                      backgroundColor: 'rgba(30, 32, 48, 0.3)'
                     }
                   }}
                 >
@@ -265,22 +325,25 @@ export const App: React.FC = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   fontWeight: 'bold',
-                  fontSize: '1.5rem'
+                  fontSize: '1.8rem'
                 }}
               >
                 TheraVoice
               </Typography>
 
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 3 }}>
                 <Button 
                   color="inherit"
                   onClick={() => setShowResources(true)}
                   startIcon={<ArticleIcon />}
                   sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
                     '&:hover': {
-                      color: 'white'
+                      color: 'white',
+                      backgroundColor: 'rgba(30, 32, 48, 0.3)'
                     }
                   }}
                 >
@@ -290,10 +353,13 @@ export const App: React.FC = () => {
                   color="inherit"
                   onClick={() => setShowAccount(true)}
                   sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
                     '&:hover': {
-                      color: 'white'
+                      color: 'white',
+                      backgroundColor: 'rgba(30, 32, 48, 0.3)'
                     }
                   }}
                 >
